@@ -1,0 +1,15 @@
+RUN: dc_test_cpu_mem.py
+Start time：2024-01-30 01:25:55.778330
+ALL will begin, your logs will be writen in cpu20240130_0925 !!!
+ALL is finished, check your logs in cpu20240130_0925 !!!
+Time consumption is: 1:50:01.181120
+End time: 2024-01-30 03:15:56.959450
+total_time = 6600
+time_interval = 1
+rps = 45000
+dc_client = docker exec -it dc-client timeout 6600 /bin/bash /entrypoint.sh --m="RPS" --S=28 --g=0.8 --c=200 --w=8 --T=1 --r=45000
+min_cpu = 1
+cpu_step = 1
+max_cpu = 55
+time_spent = 120
+ssh node16 docker exec ibench6  cpu 1 1 55 120

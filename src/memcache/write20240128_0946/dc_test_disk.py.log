@@ -1,0 +1,16 @@
+RUN: dc_test_disk.py
+Start time：2024-01-28 01:46:03.168478
+ALL will begin, your logs will be writen in write20240128_0946 !!!
+ALL is finished, check your logs in write20240128_0946 !!!
+Time consumption is: 1:05:00.181298
+End time: 2024-01-28 02:51:03.349776
+total_time: 3900
+time_interval: 1
+rps: 45000
+dc_client_cmd: docker exec -it dc-client timeout 3900 /bin/bash /entrypoint.sh --m="RPS" --S=28 --g=0.8 --c=200 --w=8 --T=1 --r=45000
+time_spent = 180
+rw_mode = randwrite
+min_BW = 2
+step = 2
+max_BW = 40
+fio_cmd = ssh node16 docker exec fiotest ./fio_test.sh 180 randwrite 2 2 40
