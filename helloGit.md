@@ -1,29 +1,8 @@
-# This is the first title
+# Git基本使用
 
-| 列标题1 | 列标题2 | 列标题3 |
-| ------ | ------ | ------ |
-| 单元格1 | 单元格2 | 单元格3 |
-| 单元格4 | 单元格5 | 单元格6 |
+首先在左边工程的文件框里
+1. 已经commit且push的文件是白色的.
+2. 修改之后会变成蓝色
+3. 如果啥都不干是橙色,或者红色?
+4. 如果只是add,也是蓝色?
 
-- list content1
-- list content2
-- list content3
-
-1. list content1
-2. list content2
-3. list content3
-
-[这是一个链接](https://example.com)
-
-
-
-*斜体字*
-
-**粗体字**
-
-_斜体字_
-
-**粗体字**
-
-- code:
-    - ``print("hello world!")``
