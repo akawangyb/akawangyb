@@ -15,7 +15,7 @@
 
 [这是一个链接](https://example.com)
 
-![interference of container](../logs/log1/myplot.svg)
+
 
 *斜体字*
 
