@@ -6,6 +6,7 @@
 # 作者: WangYuanbo
 # --------------------------------------------------
 import os
+import re
 
 import numpy as np
 import pandas as pd
@@ -66,7 +67,8 @@ def merge_raw_data(raw_service_data, raw_trouble_data, new_log_data, merged_data
     merged_df.to_csv(merged_data_path, index=False)
 
 
-def process_raw_data(raw_data_path, new_data_path, basic_info):
+# 制作可以直接使用的数据集
+def process_raw_data(raw_data_path, dataset_path, basic_info):
     new_df = pd.read_csv(raw_data_path)
     # 先删除latency为空值的行
     new_df = new_df.dropna(subset=['avg_lat'])
@@ -91,10 +93,13 @@ def process_raw_data(raw_data_path, new_data_path, basic_info):
     #     new_df[col] =
     new_df['cpu_usage_y'] = basic_info['cpu'] - new_df['cpu_usage_y']
     new_df['mem_usage_y'] = basic_info['mem'] - new_df['mem_usage_y']
-    new_df['net_in_usage_y'] = basic_info['net_in'] - new_df['net_in_usage_y']
-    new_df['net_out_usage_y'] = basic_info['net_out'] - new_df['net_out_usage_y']
+    new_df['net_in_rate_y'] = basic_info['net_in'] - new_df['net_in_rate_y']
+    new_df['net_out_rate_y'] = basic_info['net_out'] - new_df['net_out_rate_y']
     new_df['disk_in_rate_y'] = basic_info['disk_in'] - new_df['disk_in_rate_y']
     new_df['disk_out_rate_y'] = basic_info['disk_out'] - new_df['disk_out_rate_y']
+
+    t_solo = basic_info['latency']
+    new_df['avg_lat'] = new_df['avg_lat'].apply(lambda x: 1 if x < t_solo else np.exp(-(x - t_solo) / t_solo))
 
     cols = new_df.columns.tolist()
     cols.remove('Timestamp')
@@ -104,18 +109,16 @@ def process_raw_data(raw_data_path, new_data_path, basic_info):
 
     # 删除时间戳这一列
     new_df = new_df.drop('Timestamp', axis=1)
-    new_df.to_csv(new_data_path, index=False)
+    new_df.to_csv(dataset_path, index=False)
 
 
-if __name__ == '__main__':
-    # 在父目录下创建一个新的子目录用于存储新的数据集
-    father_dir = 'cpu20240130_0925'
+# 从父目录和干扰名直接获得所有数据
+def get_all(father_dir, trouble_name):
     new_dir = os.path.join(father_dir, 'processed_file')
     if not os.path.exists(new_dir):
         os.mkdir(new_dir)
     # 先获得3个原始数据路径
     service_name = "memcache"
-    trouble_name = "cpu"
     raw_service_data_path = os.path.join(father_dir, service_name + '.data.csv')
     raw_trouble_data_path = os.path.join(father_dir, trouble_name + '.data.csv')
     raw_log_path = os.path.join(father_dir, service_name + '.log')
@@ -132,3 +135,38 @@ if __name__ == '__main__':
                    raw_trouble_data=raw_trouble_data_path,
                    new_log_data=new_service_log_data,
                    merged_data_path=new_merged_data_path)
+    basic_info = {
+        'cpu': 56,
+        'mem': 256,
+        'net_in': 1000,
+        'net_out': 1000,
+        'disk_in': 200,
+        'disk_out': 200,
+        'latency': 0.5,
+    }
+    dataset_path = os.path.join(new_dir, service_name + '.' + trouble_name + '.dataset.csv')
+    process_raw_data(raw_data_path=new_merged_data_path,
+                     dataset_path=dataset_path,
+                     basic_info=basic_info)
+
+# 获得文件夹名字的前缀,也就是trouble_name
+def get_letters(s):
+    match = re.match(r'([a-z]*)', s)
+    return match.group(0) if match else ''
+
+if __name__ == '__main__':
+    # 获得当前工作目录
+    current_dir = os.getcwd()
+
+    # 获得所有子目录和文件
+    all_files_and_dirs = os.listdir(current_dir)
+
+    # 过滤出所有的子目录
+    sub_dirs = [d for d in all_files_and_dirs if os.path.isdir(os.path.join(current_dir, d))]
+
+    sub_dirs = [x for x in sub_dirs if not x.startswith('solo')]
+    for sub_dir in sub_dirs:
+        get_all(father_dir=sub_dir,trouble_name=get_letters(sub_dir))
+
+    # print(sub_dirs)
+    # get_all(father_dir='cpu20240130_0925',trouble_name='cpu')
