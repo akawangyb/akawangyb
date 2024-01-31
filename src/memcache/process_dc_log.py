@@ -86,7 +86,7 @@ def process_raw_data(raw_data_path, dataset_path, basic_info):
     for col in toMB_list:
         new_df[col] = new_df[col] / toMB
     for col in toMb_list:
-        new_df[col] = new_df[col] / toMb
+        new_df[col] = new_df[col] * 8 / toMb
 
     # cols = ['cpu_usage_y', 'mem_usage_y', 'net_in_usage_y', 'net_out_usage_y', 'disk_in_rate_y', 'disk_out_rate_y']
     # for col in cols:
